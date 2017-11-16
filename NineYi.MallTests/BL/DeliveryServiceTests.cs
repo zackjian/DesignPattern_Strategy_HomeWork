@@ -89,9 +89,51 @@ namespace NineYi.Mall.BL.Tests
             }
         }
 
+        /// <summary>
+        /// 宅配資料For郵局
+        /// </summary>
+        public static IEnumerable<object[]> DeliveryItemForPostOffice
+        {
+            get
+            {
+                return new[]
+                {
+                    new object[]
+                    {
+                        //// 要被計算的物件
+                        new DeliveryEntity()
+                        {
+                            ProductLength = 30,
+                            ProductWidth = 40,
+                            ProductHeight = 50,
+                            ProductWeight = 25,
+                            DeliveryType = DeliveryTypeEnum.PostOffice
+                        },
+                        //// 預期運費
+                        330d
+                    },
+                    new object[]
+                    {
+                        //// 要被計算的物件
+                        new DeliveryEntity()
+                        {
+                            ProductLength = 60,
+                            ProductWidth = 60,
+                            ProductHeight = 80,
+                            ProductWeight = 15,
+                            DeliveryType = DeliveryTypeEnum.PostOffice
+                        },
+                        //// 預期運費
+                        316.8d
+                    }
+                };
+            }
+        }
+
         [Theory]
         [MemberData(nameof(DeliveryItemForTCat))]
         [MemberData(nameof(DeliveryItemForKTJ))]
+        [MemberData(nameof(DeliveryItemForPostOffice))]
         public void Test_Calculate(DeliveryEntity deliveryItem, double expected)
         {
             //// Arrange

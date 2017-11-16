@@ -13,6 +13,11 @@
         /// <summary>
         /// 大榮
         /// </summary>
-        KTJ
+        KTJ,
+
+        /// <summary>
+        /// 郵局
+        /// </summary>
+        PostOffice
     }
 }

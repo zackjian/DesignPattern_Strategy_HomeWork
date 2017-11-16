@@ -53,6 +53,10 @@ namespace NineYi.Mall.BL
 
                 return fee;
             }
+            else if (deliveryItem.DeliveryType == DeliveryTypeEnum.PostOffice)
+            {
+                throw new NotImplementedException();
+            }
             else
             {
                 throw new ArgumentException("請檢查 deliveryItem.DeliveryType 參數");
