@@ -20,42 +20,29 @@ namespace NineYi.Mall.BL
                 throw new ArgumentException("請檢查 deliveryItem 參數");
             }
 
-            var fee = default(double);
-            if (deliveryItem.DeliveryType == DeliveryTypeEnum.TCat)
+            ICalculateFeeService calculateFeeService = this.CalculateFeeServiceFactory(deliveryItem.DeliveryType);
+
+            return calculateFeeService.CalculateFee(deliveryItem);
+        }
+
+        /// <summary>
+        /// CalculateFeeService 工廠
+        /// </summary>
+        /// <param name="deliveryType">DeliveryTypeEnum</param>
+        /// <returns>ICalculateFeeService</returns>
+        public ICalculateFeeService CalculateFeeServiceFactory(DeliveryTypeEnum deliveryType)
+        {
+            if (deliveryType == DeliveryTypeEnum.TCat)
             {
-                var weight = deliveryItem.ProductWeight;
-                if (weight > 20)
-                {
-                    fee = 400d;
-                }
-                else
-                {
-                    fee = 100 + weight * 10;
-                }
-                return fee;
+                return new TCatCalculateFeeService();
             }
-            else if (deliveryItem.DeliveryType == DeliveryTypeEnum.KTJ)
+            else if (deliveryType == DeliveryTypeEnum.KTJ)
             {
-                var length = deliveryItem.ProductLength;
-                var width = deliveryItem.ProductWidth;
-                var height = deliveryItem.ProductHeight;
-
-                var size = length * width * height;
-
-                if (length > 50 || width > 50 || height > 50)
-                {
-                    fee = size * 0.00001 * 110 + 50;
-                }
-                else
-                {
-                    fee = size * 0.00001 * 120;
-                }
-
-                return fee;
+                return new KTJCalculateFeeService();
             }
-            else if (deliveryItem.DeliveryType == DeliveryTypeEnum.PostOffice)
+            else if (deliveryType == DeliveryTypeEnum.PostOffice)
             {
-                throw new NotImplementedException();
+                return new PostOfficeCalculateFeeService();
             }
             else
             {
