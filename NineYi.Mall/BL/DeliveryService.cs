@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NineYi.Mall.BE;
 
 namespace NineYi.Mall.BL
@@ -8,6 +10,17 @@ namespace NineYi.Mall.BL
     /// </summary>
     public class DeliveryService
     {
+        /// <summary>
+        /// CalculateFeeDictionary
+        /// </summary>
+        private IReadOnlyDictionary<Func<DeliveryTypeEnum, bool>, ICalculateFeeService> _calculateFeeDictionary =
+            new Dictionary<Func<DeliveryTypeEnum, bool>, ICalculateFeeService>
+        {
+            { (type) => type == DeliveryTypeEnum.TCat, new TCatCalculateFeeService() },
+            { (type) => type == DeliveryTypeEnum.KTJ, new KTJCalculateFeeService() },
+            { (type) => type == DeliveryTypeEnum.PostOffice, new PostOfficeCalculateFeeService() }
+        };
+
         /// <summary>
         /// 計算運費
         /// </summary>
@@ -20,34 +33,10 @@ namespace NineYi.Mall.BL
                 throw new ArgumentException("請檢查 deliveryItem 參數");
             }
 
-            ICalculateFeeService calculateFeeService = this.CalculateFeeServiceFactory(deliveryItem.DeliveryType);
+            ICalculateFeeService calculateFeeService = 
+                this._calculateFeeDictionary.FirstOrDefault(x => x.Key(deliveryItem.DeliveryType)).Value;
 
             return calculateFeeService.CalculateFee(deliveryItem);
-        }
-
-        /// <summary>
-        /// CalculateFeeService 工廠
-        /// </summary>
-        /// <param name="deliveryType">DeliveryTypeEnum</param>
-        /// <returns>ICalculateFeeService</returns>
-        public ICalculateFeeService CalculateFeeServiceFactory(DeliveryTypeEnum deliveryType)
-        {
-            if (deliveryType == DeliveryTypeEnum.TCat)
-            {
-                return new TCatCalculateFeeService();
-            }
-            else if (deliveryType == DeliveryTypeEnum.KTJ)
-            {
-                return new KTJCalculateFeeService();
-            }
-            else if (deliveryType == DeliveryTypeEnum.PostOffice)
-            {
-                return new PostOfficeCalculateFeeService();
-            }
-            else
-            {
-                throw new ArgumentException("請檢查 deliveryItem.DeliveryType 參數");
-            }
         }
     }
 }

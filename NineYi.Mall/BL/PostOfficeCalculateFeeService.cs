@@ -19,14 +19,9 @@ namespace NineYi.Mall.BL
         /// <returns>費用</returns>
         public double CalculateFee(DeliveryEntity entity)
         {
-            var length = entity.ProductLength;
-            var width = entity.ProductWidth;
-            var height = entity.ProductHeight;
-            var weight = entity.ProductWeight;
+            var weightFee = this.GetWeightFee(entity.ProductWeight);
 
-            var weightFee = (weight * 10) + 80;
-
-            var volumeFee = length * width * height * 0.00001 * 110;
+            var volumeFee = this.GetVolumeFee(entity.ProductLength, entity.ProductWidth, entity.ProductHeight);
 
             if (weightFee > volumeFee)
             {
@@ -36,6 +31,28 @@ namespace NineYi.Mall.BL
             {
                 return volumeFee;
             }
+        }
+
+        /// <summary>
+        /// GetWeightFee
+        /// </summary>
+        /// <param name="weight">weight</param>
+        /// <returns>WeightFee</returns>
+        private double GetWeightFee(double weight)
+        {
+            return (weight * 10) + 80;
+        }
+
+        /// <summary>
+        /// GetVolumeFee
+        /// </summary>
+        /// <param name="length">length</param>
+        /// <param name="width">width</param>
+        /// <param name="height">height</param>
+        /// <returns>VolumeFee</returns>
+        private double GetVolumeFee(double length, double width, double height)
+        {
+            return length * width * height * 0.00001 * 110;
         }
     }
 }
