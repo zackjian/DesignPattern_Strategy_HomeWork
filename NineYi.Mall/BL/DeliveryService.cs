@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NineYi.Mall.BE;
 
 namespace NineYi.Mall.BL
@@ -8,6 +10,17 @@ namespace NineYi.Mall.BL
     /// </summary>
     public class DeliveryService
     {
+        /// <summary>
+        /// CalculateFeeDictionary
+        /// </summary>
+        private IReadOnlyDictionary<Func<DeliveryTypeEnum, bool>, ICalculateFeeService> _calculateFeeDictionary =
+            new Dictionary<Func<DeliveryTypeEnum, bool>, ICalculateFeeService>
+        {
+            { (type) => type == DeliveryTypeEnum.TCat, new TCatCalculateFeeService() },
+            { (type) => type == DeliveryTypeEnum.KTJ, new KTJCalculateFeeService() },
+            { (type) => type == DeliveryTypeEnum.PostOffice, new PostOfficeCalculateFeeService() }
+        };
+
         /// <summary>
         /// 計算運費
         /// </summary>
@@ -20,47 +33,10 @@ namespace NineYi.Mall.BL
                 throw new ArgumentException("請檢查 deliveryItem 參數");
             }
 
-            var fee = default(double);
-            if (deliveryItem.DeliveryType == DeliveryTypeEnum.TCat)
-            {
-                var weight = deliveryItem.ProductWeight;
-                if (weight > 20)
-                {
-                    fee = 400d;
-                }
-                else
-                {
-                    fee = 100 + weight * 10;
-                }
-                return fee;
-            }
-            else if (deliveryItem.DeliveryType == DeliveryTypeEnum.KTJ)
-            {
-                var length = deliveryItem.ProductLength;
-                var width = deliveryItem.ProductWidth;
-                var height = deliveryItem.ProductHeight;
+            ICalculateFeeService calculateFeeService = 
+                this._calculateFeeDictionary.FirstOrDefault(x => x.Key(deliveryItem.DeliveryType)).Value;
 
-                var size = length * width * height;
-
-                if (length > 50 || width > 50 || height > 50)
-                {
-                    fee = size * 0.00001 * 110 + 50;
-                }
-                else
-                {
-                    fee = size * 0.00001 * 120;
-                }
-
-                return fee;
-            }
-            else if (deliveryItem.DeliveryType == DeliveryTypeEnum.PostOffice)
-            {
-                throw new NotImplementedException();
-            }
-            else
-            {
-                throw new ArgumentException("請檢查 deliveryItem.DeliveryType 參數");
-            }
+            return calculateFeeService.CalculateFee(deliveryItem);
         }
     }
 }
