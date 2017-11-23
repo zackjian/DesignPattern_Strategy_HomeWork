@@ -23,14 +23,7 @@ namespace NineYi.Mall.BL
 
             var volumeFee = this.GetVolumeFee(entity.ProductLength, entity.ProductWidth, entity.ProductHeight);
 
-            if (weightFee > volumeFee)
-            {
-                return weightFee;
-            }
-            else
-            {
-                return volumeFee;
-            }
+            return Math.Max(weightFee, volumeFee);
         }
 
         /// <summary>
